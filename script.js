@@ -9,30 +9,27 @@ const galleryStage=document.querySelector('.gallery-stage');
 const brandTitle=document.querySelector('.brand-title');
 const vinylRecord=document.getElementById('vinyl-record'),vinylBtn=document.getElementById('vinylBtn'),vinylDisc=document.getElementById('vinylDisc'),bgm=document.getElementById('bgm');
 
-// Recording mode — disables Canvas particles for smooth video capture
+// Recording mode — bigger cards, hide video, keep ALL effects
 const isRecord=new URLSearchParams(window.location.search).has('record');
 if(isRecord){
   const rs=document.createElement('style');rs.textContent=`
-    :root{--card-w:220px;--card-h:308px;--perspective:1600px}
-    .brand-title{top:0.8rem;font-size:1.2rem}
-    .vinyl-player{top:0.6rem;right:0.8rem}
-    .vinyl-btn{width:36px;height:36px}
-    .vinyl-disc{width:32px;height:32px}
-    canvas{display:none!important}
+    :root{--card-w:320px;--card-h:448px;--perspective:2400px}
+    .brand-title{top:1.2rem}
+    .vinyl-player{top:1rem;right:1.2rem}
     #videoIntro{display:none!important}
   `;document.head.appendChild(rs);
 }
 
 // Device detection
 const isMobile=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-const CANVAS_SCALE=isRecord?1:(isMobile?0.35:0.6);
+const CANVAS_SCALE=isMobile?0.35:0.6;
 let W,H;function rs(){W=Math.round(window.innerWidth*CANVAS_SCALE);H=Math.round(window.innerHeight*CANVAS_SCALE);canvas.width=W;canvas.height=H;canvas.style.width=window.innerWidth+'px';canvas.style.height=window.innerHeight+'px'}
 window.addEventListener('resize',rs);rs();
 
-// Animation pause flag — skip rendering during video playback / recording
-let animRunning=!isRecord;
+// Animation pause flag — skip rendering during video playback
+let animRunning=true;
 function pauseAnim(){animRunning=false}
-function resumeAnim(){animRunning=!isRecord}
+function resumeAnim(){animRunning=true}
 
 // Video intro — pause canvas while playing, resume when hidden
 (function(){
@@ -53,7 +50,7 @@ function resumeAnim(){animRunning=!isRecord}
 })();
 
 // Firefly — 100
-const FFC=isRecord?0:(isMobile?40:100);let zoomActive=false;
+const FFC=isRecord?60:(isMobile?40:100);let zoomActive=false;
 
 // Phase 3 BG
 const bgDiv=document.createElement('div');bgDiv.id='phase3-bg';document.body.appendChild(bgDiv);
@@ -160,14 +157,14 @@ let activeSet=new Set(),grpSeq=[],grpIdx=0,sglSeq=[],sglIdx=0,sglStyleIdx=0;
 // Helpers
 function shuf(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
 function hideAll(){for(let i=0;i<TOTAL;i++){const cd=cards[i];cd.el.style.transition='opacity 0.4s ease';cd.el.style.opacity='0';cd.el.style.transform='rotateY(0deg) translateZ(-500px) scale(0.5)';cd.el.style.filter='none';cd.el.classList.remove('is-active','hovered','touched');cd.el.style.pointerEvents='none';cd.el.style.width='';cd.el.style.height='';cd.el.style.left='';cd.el.style.top=''}}
-function posCard(cd,tx,ty,tz,sc,op,ry=0,rz=0,rx=0){const o=isRecord&&op>0&&op<0.3?0:op;cd.el.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg) translateZ(${tz}px) translateX(${tx}px) translateY(${ty}px) rotateZ(${rz}deg) scale(${sc})`;cd.el.style.opacity=o;cd.el.style.filter='none'}
+function posCard(cd,tx,ty,tz,sc,op,ry=0,rz=0,rx=0){cd.el.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg) translateZ(${tz}px) translateX(${tx}px) translateY(${ty}px) rotateZ(${rz}deg) scale(${sc})`;cd.el.style.opacity=op;cd.el.style.filter='none'}
 
 // Exit FX
-function planeExit(wel){wel.style.width='';wel.style.height='';wel.style.left='';wel.style.top='';const dur=isRecord?'0.18s':'0.35s';wel.style.transition=`transform ${dur} cubic-bezier(.4,0,.7,1), opacity ${dur} ease`;const d=Math.random()>0.5?1:-1;wel.style.transform=`rotateY(0deg) translateZ(0px) translateX(${d*250}px) translateY(-90px) rotateZ(${d*35}deg) scale(0.45)`;wel.style.opacity='0';wel.style.filter='none';wel.style.pointerEvents='none'}
-function crumpExit(wel){wel.style.width='';wel.style.height='';wel.style.left='';wel.style.top='';const dur=isRecord?'0.15s':'0.25s';wel.style.transition=`transform ${dur} cubic-bezier(.6,0,1,.45), opacity ${dur} ease`;const rz=(Math.random()-0.5)*90;wel.style.transform=`rotateY(0deg) translateZ(0px) scale(0.06) rotateZ(${rz}deg)`;wel.style.opacity='0';wel.style.filter='none';wel.style.pointerEvents='none';if(!isRecord)shatter(wel)}
-function gridPos(n){let cw=isRecord?300:280,ch=isRecord?400:340,cols,rows;
-  if(n===3){cols=3;rows=1;cw=isRecord?260:240} // 3-card: wide row
-  else if(n===2){cols=2;rows=1;cw=isRecord?280:260} // 2-card: side by side
+function planeExit(wel){wel.style.width='';wel.style.height='';wel.style.left='';wel.style.top='';wel.style.transition='transform 0.35s cubic-bezier(.4,0,.7,1), opacity 0.25s ease';const d=Math.random()>0.5?1:-1;wel.style.transform=`rotateY(0deg) translateZ(0px) translateX(${d*250}px) translateY(-90px) rotateZ(${d*35}deg) scale(0.45)`;wel.style.opacity='0';wel.style.filter='none';wel.style.pointerEvents='none'}
+function crumpExit(wel){wel.style.width='';wel.style.height='';wel.style.left='';wel.style.top='';wel.style.transition='transform 0.25s cubic-bezier(.6,0,1,.45), opacity 0.15s ease';const rz=(Math.random()-0.5)*90;wel.style.transform=`rotateY(0deg) translateZ(0px) scale(0.06) rotateZ(${rz}deg)`;wel.style.opacity='0';wel.style.filter='none';wel.style.pointerEvents='none';shatter(wel)}
+function gridPos(n){let cw=isRecord?420:280,ch=isRecord?580:340,cols,rows;
+  if(n===3){cols=3;rows=1;cw=isRecord?360:240} // 3-card: wide row
+  else if(n===2){cols=2;rows=1;cw=isRecord?380:260} // 2-card: side by side
   else{cols=n<=4?2:n<=6?3:4;rows=Math.ceil(n/cols)}
   const p=[];for(let i=0;i<n;i++){const c=i%cols,r=Math.floor(i/cols);p.push({x:(c-(cols-1)/2)*cw,y:(r-(rows-1)/2)*ch})}return p}
 
@@ -191,7 +188,7 @@ function ph1_chime(){phase='chime';activeSet.clear();hideAll();
   // Gentle corridor pan: immediate start
   for(let i=0;i<TOTAL;i++){
       const cd=cards[i];
-      const panDur=isRecord?7:10,panWait=isRecord?7500:10400; cd.el.style.transition=`transform ${panDur}s cubic-bezier(.4,0,.6,1)`;
+      cd.el.style.transition='transform 10s cubic-bezier(.4,0,.6,1)';
       const curX=parseFloat(cd.el.style.transform.match(/translateX\(([^)]+)/)?.[1]||0);
       const curY=parseFloat(cd.el.style.transform.match(/translateY\(([^)]+)/)?.[1]||0);
       const opacity=0.55+0.4*Math.sin((i/TOTAL)*Math.PI);
@@ -199,15 +196,15 @@ function ph1_chime(){phase='chime';activeSet.clear();hideAll();
     }
     // Sequential shatter: left to right, one by one into starfield
     setTimeout(()=>{
-      if(!isRecord)stopBeat();
+      stopBeat();
       for(let i=0;i<TOTAL;i++){
         setTimeout(()=>{
-          const cd=cards[i];if(!isRecord)emberize(cd.el);cd.el.classList.remove('chime');
-          cd.el.style.transition='opacity 0.15s ease';cd.el.style.opacity='0';cd.el.style.pointerEvents='none';
-          if(i===TOTAL-1)setTimeout(()=>{hideAll();ph0()},isRecord?300:800);
-        },i*(isRecord?80:120));
+          const cd=cards[i];emberize(cd.el);cd.el.classList.remove('chime');
+          cd.el.style.transition='opacity 0.2s ease';cd.el.style.opacity='0';cd.el.style.pointerEvents='none';
+          if(i===TOTAL-1)setTimeout(()=>{hideAll();ph0()},800);
+        },i*120); // 120ms stagger, ~3s total
       }
-    },panWait)}
+    },10400)}
 
 // Phase 0: Ripple Opening — core photo + concentric rings bloom outward
 function ph0(){
@@ -221,7 +218,7 @@ function ph0(){
   const others=shuf([...Array(TOTAL).keys()].filter(i=>i!==centerIdx));
 
   // Ring config — counts must sum to TOTAL-1 (24)
-  const rz=isRecord?1.0:1; // 720p recording: default radii, no expansion needed
+  const rz=isRecord?1.5:1; // bigger radii for 1080p large cards
   const ringCfg=[
     {count:5,radius:180*rz,scale:0.82,delayBase:150},
     {count:8,radius:320*rz,scale:0.68,delayBase:500},
@@ -355,7 +352,7 @@ function showGrp(){
 
 // Quick disperse exit (0.8s)
 function phaseOut(){phase='out';
-  for(const idx of activeSet){const cd=cards[idx];cd.el.style.transition=`transform 0.5s cubic-bezier(.4,0,.7,1), opacity 0.4s ease${isRecord?'':'',''}`;cd.el.style.transform+=` translateX(${(Math.random()-0.5)*300}px) translateY(${(Math.random()-0.5)*200}px) scale(0.3)`;cd.el.style.opacity='0';if(!isRecord)cd.el.style.filter='blur(3px)';cd.el.classList.remove('is-active')}
+  for(const idx of activeSet){const cd=cards[idx];cd.el.style.transition='transform 0.5s cubic-bezier(.4,0,.7,1), opacity 0.4s ease';cd.el.style.transform+=` translateX(${(Math.random()-0.5)*300}px) translateY(${(Math.random()-0.5)*200}px) scale(0.3)`;cd.el.style.opacity='0';cd.el.style.filter='blur(3px)';cd.el.classList.remove('is-active')}
   activeSet.clear();setTimeout(()=>ph3(),550)}
 
 // Phase 3: Singles + BG
@@ -387,11 +384,11 @@ function showSgl(){
         break;
       case 1: // ── 推拉前移（dolly zoom）──
         posCard(cd,sp.x,sp.y,-220,1.55,0.08);
-        if(!isRecord)cd.el.style.filter='blur(2.5px)';
+        cd.el.style.filter='blur(2.5px)';
         void cd.el.offsetWidth;
-        cd.el.style.transition=`transform 0.75s cubic-bezier(.1,.9,.3,1), opacity 0.4s ease${isRecord?'':', filter 0.55s ease'}`;
+        cd.el.style.transition='transform 0.75s cubic-bezier(.1,.9,.3,1), opacity 0.4s ease, filter 0.55s ease';
         posCard(cd,sp.x,sp.y,0,1,1);
-        if(!isRecord)cd.el.style.filter='blur(0px)';
+        cd.el.style.filter='blur(0px)';
         break;
       case 2:{ // ── 横向擦除 ──
         posCard(cd,sp.x,sp.y,0,1,1);
@@ -409,11 +406,11 @@ function showSgl(){
         break;
       case 4: // ── 模糊对焦 ──
         posCard(cd,sp.x,sp.y,0,1.04,0.22);
-        if(!isRecord)cd.el.style.filter='blur(16px)';
+        cd.el.style.filter='blur(16px)';
         void cd.el.offsetWidth;
-        cd.el.style.transition=`transform 0.68s cubic-bezier(.15,.82,.35,1), opacity 0.45s ease${isRecord?'':', filter 0.5s ease'}`;
+        cd.el.style.transition='transform 0.68s cubic-bezier(.15,.82,.35,1), opacity 0.45s ease, filter 0.5s ease';
         posCard(cd,sp.x,sp.y,0,1,1);
-        if(!isRecord)cd.el.style.filter='blur(0px)';
+        cd.el.style.filter='blur(0px)';
         break;
     }
     cd.el.classList.add('is-active');cd.el.style.pointerEvents='auto';
@@ -441,7 +438,7 @@ document.addEventListener('click',e=>{if(e.target.closest('#vinylBtn')||e.target
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&document.activeElement===document.body){e.preventDefault();if(!ceremonyDone)initIntro();else toggleBGM()}});
 
 // Beat sim
-let bT=null;function startBeat(){if(isRecord)return;if(!isRecord)stopBeat();bT=setInterval(()=>{if(isMusicOn&&ceremonyDone)tBB()},520)}function stopBeat(){if(bT){clearInterval(bT);bT=null}}
+let bT=null;function startBeat(){stopBeat();bT=setInterval(()=>{if(isMusicOn&&ceremonyDone)tBB()},520)}function stopBeat(){if(bT){clearInterval(bT);bT=null}}
 
 // Hover
 let hC=null,tC=null,gT=null;

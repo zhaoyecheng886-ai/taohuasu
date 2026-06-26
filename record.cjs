@@ -6,30 +6,32 @@ const FFMPEG = 'C:/Users/86156/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmp
 const OUT = 'd:/Desktop/AI相册/桃花酥_高清.mp4';
 
 if (existsSync(OUT)) rmSync(OUT);
-console.log('🎬 录制 (1280x720 + 有头GPU + 30fps)');
+console.log('🎬 录制 1920x1080 + 全特效 + BGM');
 
 (async () => {
   const browser = await chromium.launch({
     headless: false,
-    args: ['--no-sandbox', '--disable-extensions', '--start-maximized'],
+    args: ['--no-sandbox', '--start-maximized'],
   });
   const ctx = await browser.newContext({
-    viewport: { width: 1280, height: 720 },
-    recordVideo: { dir: 'd:/Desktop/AI相册', size: { width: 1280, height: 720 }, fps: 30 },
+    viewport: { width: 1920, height: 1080 },
+    recordVideo: { dir: 'd:/Desktop/AI相册', size: { width: 1920, height: 1080 }, fps: 30 },
   });
   const page = await ctx.newPage();
 
+  // Light keep-alive — evaluate, not mouse move (less GPU overhead)
   const keepAlive = setInterval(async () => {
-    try { await page.evaluate(() => { document.body.style.cursor = document.body.style.cursor ? '' : 'default'; }); } catch(e) {}
-  }, 3000);
+    try { await page.evaluate(() => { window.__t = Date.now(); }); } catch(e) {}
+  }, 5000);
 
   await page.goto('http://localhost:8765/index.html?record', { waitUntil: 'domcontentloaded', timeout: 15000 });
   console.log('✅ 加载');
-  await page.waitForTimeout(200);
-  console.log('▶️  点击');
+  await page.waitForTimeout(500);
+  console.log('▶️  启动');
   await page.click('body');
 
-  for (let s = 1; s <= 52; s++) {
+  // 55s covers full cycle: ripple~3s + groups~8s + singles~25s + chime~18s
+  for (let s = 1; s <= 55; s++) {
     await page.waitForTimeout(1000);
     if (s % 10 === 0) console.log(`  ${s}s`);
   }
@@ -48,7 +50,7 @@ console.log('🎬 录制 (1280x720 + 有头GPU + 30fps)');
     `"${FFMPEG}" -i "${raw}" -i "d:/Desktop/AI相册/想你和我们的以后.mp3" ` +
     `-c:v libx264 -preset fast -crf 16 -c:a aac -b:a 192k ` +
     `-map 0:v:0 -map 1:a:0 -filter:a "volume=0.55" ` +
-    `-map_metadata -1 -map_chapters -1 -t 48 ` +
+    `-map_metadata -1 -map_chapters -1 -t 50 ` +
     `-movflags +faststart -y "${OUT}"`,
     { stdio: 'inherit' }
   );
