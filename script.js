@@ -17,6 +17,7 @@ if(isRecord){
     .brand-title{top:1.2rem}
     .vinyl-player{top:1rem;right:1.2rem}
     canvas{display:none!important}
+    #videoIntro{display:none!important}
   `;document.head.appendChild(rs);
 }
 
@@ -157,11 +158,11 @@ let activeSet=new Set(),grpSeq=[],grpIdx=0,sglSeq=[],sglIdx=0,sglStyleIdx=0;
 // Helpers
 function shuf(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
 function hideAll(){for(let i=0;i<TOTAL;i++){const cd=cards[i];cd.el.style.transition='opacity 0.4s ease';cd.el.style.opacity='0';cd.el.style.transform='rotateY(0deg) translateZ(-500px) scale(0.5)';cd.el.style.filter='none';cd.el.classList.remove('is-active','hovered','touched');cd.el.style.pointerEvents='none';cd.el.style.width='';cd.el.style.height='';cd.el.style.left='';cd.el.style.top=''}}
-function posCard(cd,tx,ty,tz,sc,op,ry=0,rz=0,rx=0){cd.el.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg) translateZ(${tz}px) translateX(${tx}px) translateY(${ty}px) rotateZ(${rz}deg) scale(${sc})`;cd.el.style.opacity=op;cd.el.style.filter='none'}
+function posCard(cd,tx,ty,tz,sc,op,ry=0,rz=0,rx=0){const o=isRecord&&op>0&&op<0.3?0:op;cd.el.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg) translateZ(${tz}px) translateX(${tx}px) translateY(${ty}px) rotateZ(${rz}deg) scale(${sc})`;cd.el.style.opacity=o;cd.el.style.filter='none'}
 
 // Exit FX
-function planeExit(wel){wel.style.width='';wel.style.height='';wel.style.left='';wel.style.top='';wel.style.transition='transform 0.35s cubic-bezier(.4,0,.7,1), opacity 0.25s ease';const d=Math.random()>0.5?1:-1;wel.style.transform=`rotateY(0deg) translateZ(0px) translateX(${d*250}px) translateY(-90px) rotateZ(${d*35}deg) scale(0.45)`;wel.style.opacity='0';wel.style.filter='none';wel.style.pointerEvents='none'}
-function crumpExit(wel){wel.style.width='';wel.style.height='';wel.style.left='';wel.style.top='';wel.style.transition='transform 0.25s cubic-bezier(.6,0,1,.45), opacity 0.15s ease';const rz=(Math.random()-0.5)*90;wel.style.transform=`rotateY(0deg) translateZ(0px) scale(0.06) rotateZ(${rz}deg)`;wel.style.opacity='0';wel.style.filter='none';wel.style.pointerEvents='none';shatter(wel)}
+function planeExit(wel){wel.style.width='';wel.style.height='';wel.style.left='';wel.style.top='';const dur=isRecord?'0.18s':'0.35s';wel.style.transition=`transform ${dur} cubic-bezier(.4,0,.7,1), opacity ${dur} ease`;const d=Math.random()>0.5?1:-1;wel.style.transform=`rotateY(0deg) translateZ(0px) translateX(${d*250}px) translateY(-90px) rotateZ(${d*35}deg) scale(0.45)`;wel.style.opacity='0';wel.style.filter='none';wel.style.pointerEvents='none'}
+function crumpExit(wel){wel.style.width='';wel.style.height='';wel.style.left='';wel.style.top='';const dur=isRecord?'0.15s':'0.25s';wel.style.transition=`transform ${dur} cubic-bezier(.6,0,1,.45), opacity ${dur} ease`;const rz=(Math.random()-0.5)*90;wel.style.transform=`rotateY(0deg) translateZ(0px) scale(0.06) rotateZ(${rz}deg)`;wel.style.opacity='0';wel.style.filter='none';wel.style.pointerEvents='none';if(!isRecord)shatter(wel)}
 function gridPos(n){let cw=isRecord?420:280,ch=isRecord?580:340,cols,rows;
   if(n===3){cols=3;rows=1;cw=isRecord?360:240} // 3-card: wide row
   else if(n===2){cols=2;rows=1;cw=isRecord?380:260} // 2-card: side by side
@@ -185,10 +186,10 @@ function ph1_chime(){phase='chime';activeSet.clear();hideAll();
     cd.el.classList.add('chime');cd.el.classList.remove('is-active');
     if(ml[i].isVideo&&cd.me)cd.me.pause();
   }
-  // Gentle corridor pan: immediate start, 10s
+  // Gentle corridor pan: immediate start
   for(let i=0;i<TOTAL;i++){
       const cd=cards[i];
-      cd.el.style.transition='transform 10s cubic-bezier(.4,0,.6,1)';
+      const panDur=isRecord?7:10,panWait=isRecord?7500:10400; cd.el.style.transition=`transform ${panDur}s cubic-bezier(.4,0,.6,1)`;
       const curX=parseFloat(cd.el.style.transform.match(/translateX\(([^)]+)/)?.[1]||0);
       const curY=parseFloat(cd.el.style.transform.match(/translateY\(([^)]+)/)?.[1]||0);
       const opacity=0.55+0.4*Math.sin((i/TOTAL)*Math.PI);
@@ -196,15 +197,15 @@ function ph1_chime(){phase='chime';activeSet.clear();hideAll();
     }
     // Sequential shatter: left to right, one by one into starfield
     setTimeout(()=>{
-      stopBeat();
+      if(!isRecord)stopBeat();
       for(let i=0;i<TOTAL;i++){
         setTimeout(()=>{
-          const cd=cards[i];emberize(cd.el);cd.el.classList.remove('chime');
-          cd.el.style.transition='opacity 0.2s ease';cd.el.style.opacity='0';cd.el.style.pointerEvents='none';
-          if(i===TOTAL-1)setTimeout(()=>{hideAll();ph0()},800);
-        },i*120); // 120ms stagger, ~3s total
+          const cd=cards[i];if(!isRecord)emberize(cd.el);cd.el.classList.remove('chime');
+          cd.el.style.transition='opacity 0.15s ease';cd.el.style.opacity='0';cd.el.style.pointerEvents='none';
+          if(i===TOTAL-1)setTimeout(()=>{hideAll();ph0()},isRecord?300:800);
+        },i*(isRecord?80:120));
       }
-    },10400)}
+    },panWait)}
 
 // Phase 0: Ripple Opening — core photo + concentric rings bloom outward
 function ph0(){
@@ -384,11 +385,11 @@ function showSgl(){
         break;
       case 1: // ── 推拉前移（dolly zoom）──
         posCard(cd,sp.x,sp.y,-220,1.55,0.08);
-        cd.el.style.filter='blur(2.5px)';
+        if(!isRecord)cd.el.style.filter='blur(2.5px)';
         void cd.el.offsetWidth;
-        cd.el.style.transition='transform 0.75s cubic-bezier(.1,.9,.3,1), opacity 0.4s ease, filter 0.55s ease';
+        cd.el.style.transition=`transform 0.75s cubic-bezier(.1,.9,.3,1), opacity 0.4s ease${isRecord?'':', filter 0.55s ease'}`;
         posCard(cd,sp.x,sp.y,0,1,1);
-        cd.el.style.filter='blur(0px)';
+        if(!isRecord)cd.el.style.filter='blur(0px)';
         break;
       case 2:{ // ── 横向擦除 ──
         posCard(cd,sp.x,sp.y,0,1,1);
@@ -406,11 +407,11 @@ function showSgl(){
         break;
       case 4: // ── 模糊对焦 ──
         posCard(cd,sp.x,sp.y,0,1.04,0.22);
-        cd.el.style.filter='blur(16px)';
+        if(!isRecord)cd.el.style.filter='blur(16px)';
         void cd.el.offsetWidth;
-        cd.el.style.transition='transform 0.68s cubic-bezier(.15,.82,.35,1), opacity 0.45s ease, filter 0.5s ease';
+        cd.el.style.transition=`transform 0.68s cubic-bezier(.15,.82,.35,1), opacity 0.45s ease${isRecord?'':', filter 0.5s ease'}`;
         posCard(cd,sp.x,sp.y,0,1,1);
-        cd.el.style.filter='blur(0px)';
+        if(!isRecord)cd.el.style.filter='blur(0px)';
         break;
     }
     cd.el.classList.add('is-active');cd.el.style.pointerEvents='auto';
@@ -438,7 +439,7 @@ document.addEventListener('click',e=>{if(e.target.closest('#vinylBtn')||e.target
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&document.activeElement===document.body){e.preventDefault();if(!ceremonyDone)initIntro();else toggleBGM()}});
 
 // Beat sim
-let bT=null;function startBeat(){if(isRecord)return;stopBeat();bT=setInterval(()=>{if(isMusicOn&&ceremonyDone)tBB()},520)}function stopBeat(){if(bT){clearInterval(bT);bT=null}}
+let bT=null;function startBeat(){if(isRecord)return;if(!isRecord)stopBeat();bT=setInterval(()=>{if(isMusicOn&&ceremonyDone)tBB()},520)}function stopBeat(){if(bT){clearInterval(bT);bT=null}}
 
 // Hover
 let hC=null,tC=null,gT=null;
