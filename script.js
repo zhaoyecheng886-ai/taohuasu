@@ -21,10 +21,8 @@ if(isRecord){
   // Wait for all resources before recording starts
   window.__recordReady=false;
   (function checkReady(){
-    const imgs=document.querySelectorAll('.card-media img, .card-media video');
-    const allReady=imgs.length===25&&[...imgs].every(el=>{
-      return el.tagName==='IMG'?el.complete&&el.naturalWidth>0:el.readyState>=2;
-    });
+    const imgs=document.querySelectorAll('.card-media');
+    const allReady=imgs.length===25&&[...imgs].every(el=>el.complete&&el.naturalWidth>0);
     if(allReady){window.__recordReady=true;}
     else{setTimeout(checkReady,250);}
   })();
