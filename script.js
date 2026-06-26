@@ -13,9 +13,11 @@ const vinylRecord=document.getElementById('vinyl-record'),vinylBtn=document.getE
 const isRecord=new URLSearchParams(window.location.search).has('record');
 if(isRecord){
   const rs=document.createElement('style');rs.textContent=`
-    :root{--card-w:320px;--card-h:448px;--perspective:2400px}
-    .brand-title{top:1.2rem}
-    .vinyl-player{top:1rem;right:1.2rem}
+    :root{--card-w:220px;--card-h:308px;--perspective:1600px}
+    .brand-title{top:0.8rem;font-size:1.2rem}
+    .vinyl-player{top:0.6rem;right:0.8rem}
+    .vinyl-btn{width:36px;height:36px}
+    .vinyl-disc{width:32px;height:32px}
     canvas{display:none!important}
     #videoIntro{display:none!important}
   `;document.head.appendChild(rs);
@@ -163,9 +165,9 @@ function posCard(cd,tx,ty,tz,sc,op,ry=0,rz=0,rx=0){const o=isRecord&&op>0&&op<0.
 // Exit FX
 function planeExit(wel){wel.style.width='';wel.style.height='';wel.style.left='';wel.style.top='';const dur=isRecord?'0.18s':'0.35s';wel.style.transition=`transform ${dur} cubic-bezier(.4,0,.7,1), opacity ${dur} ease`;const d=Math.random()>0.5?1:-1;wel.style.transform=`rotateY(0deg) translateZ(0px) translateX(${d*250}px) translateY(-90px) rotateZ(${d*35}deg) scale(0.45)`;wel.style.opacity='0';wel.style.filter='none';wel.style.pointerEvents='none'}
 function crumpExit(wel){wel.style.width='';wel.style.height='';wel.style.left='';wel.style.top='';const dur=isRecord?'0.15s':'0.25s';wel.style.transition=`transform ${dur} cubic-bezier(.6,0,1,.45), opacity ${dur} ease`;const rz=(Math.random()-0.5)*90;wel.style.transform=`rotateY(0deg) translateZ(0px) scale(0.06) rotateZ(${rz}deg)`;wel.style.opacity='0';wel.style.filter='none';wel.style.pointerEvents='none';if(!isRecord)shatter(wel)}
-function gridPos(n){let cw=isRecord?420:280,ch=isRecord?580:340,cols,rows;
-  if(n===3){cols=3;rows=1;cw=isRecord?360:240} // 3-card: wide row
-  else if(n===2){cols=2;rows=1;cw=isRecord?380:260} // 2-card: side by side
+function gridPos(n){let cw=isRecord?300:280,ch=isRecord?400:340,cols,rows;
+  if(n===3){cols=3;rows=1;cw=isRecord?260:240} // 3-card: wide row
+  else if(n===2){cols=2;rows=1;cw=isRecord?280:260} // 2-card: side by side
   else{cols=n<=4?2:n<=6?3:4;rows=Math.ceil(n/cols)}
   const p=[];for(let i=0;i<n;i++){const c=i%cols,r=Math.floor(i/cols);p.push({x:(c-(cols-1)/2)*cw,y:(r-(rows-1)/2)*ch})}return p}
 
@@ -219,7 +221,7 @@ function ph0(){
   const others=shuf([...Array(TOTAL).keys()].filter(i=>i!==centerIdx));
 
   // Ring config — counts must sum to TOTAL-1 (24)
-  const rz=isRecord?1.5:1; // ring radius multiplier for larger cards in recording
+  const rz=isRecord?1.0:1; // 720p recording: default radii, no expansion needed
   const ringCfg=[
     {count:5,radius:180*rz,scale:0.82,delayBase:150},
     {count:8,radius:320*rz,scale:0.68,delayBase:500},
