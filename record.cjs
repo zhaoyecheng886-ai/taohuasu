@@ -1,76 +1,76 @@
 const { chromium } = require('C:/Users/86156/AppData/Local/Temp/tmp.5UI6S5F41j/node_modules/playwright');
-const { execSync, spawn } = require('child_process');
-const { statSync, rmSync, existsSync } = require('fs');
+const { execSync } = require('child_process');
+const { readdirSync, statSync, rmSync, existsSync } = require('fs');
 
 const FFMPEG = 'C:/Users/86156/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe/ffmpeg-8.1.1-full_build/bin/ffmpeg.exe';
 const OUT = 'd:/Desktop/AI相册/桃花酥_高清.mp4';
-const RAW = 'd:/Desktop/AI相册/_raw.mp4';
-const CHROME = 'C:/Users/86156/AppData/Local/ms-playwright/chromium-1228/chrome-win64/chrome.exe';
 
 if (existsSync(OUT)) rmSync(OUT);
-if (existsSync(RAW)) rmSync(RAW);
-
-console.log('🎬 录制 — 等待全部资源加载 → gdigrab 录屏 → 合成BGM');
+console.log('🎬 录制 1280x720 → Lanczos升1080p + BGM');
 
 (async () => {
-  // 1. Launch Chrome kiosk mode
-  const chromeProc = spawn(CHROME, [
-    '--kiosk', 'http://localhost:8765/index.html?record',
-    '--window-position=0,0', '--window-size=1920,1080',
-    '--remote-debugging-port=9222', '--no-sandbox',
-    '--disable-extensions', '--force-device-scale-factor=1',
-  ], { stdio: 'ignore', detached: true });
+  const browser = await chromium.launch({
+    headless: true,
+    args: [
+      '--no-sandbox',
+      '--disable-gpu',
+      '--disable-extensions',
+      '--disable-background-timer-throttling',
+      '--disable-renderer-backgrounding',
+    ],
+  });
+  const ctx = await browser.newContext({
+    viewport: { width: 1280, height: 720 },
+    recordVideo: { dir: 'd:/Desktop/AI相册', size: { width: 1280, height: 720 }, fps: 24 },
+  });
+  const page = await ctx.newPage();
 
-  await new Promise(r => setTimeout(r, 3000));
+  // Keep rAF alive
+  const ka = setInterval(async () => {
+    try { await page.evaluate(() => document.title); } catch(e) {}
+  }, 2000);
 
-  // 2. Connect
-  const browser = await chromium.connectOverCDP('http://localhost:9222');
-  const page = browser.contexts()[0].pages()[0];
-  console.log('✅ 已连接');
+  await page.goto('http://localhost:8765/index.html?record', { waitUntil: 'domcontentloaded', timeout: 15000 });
+  console.log('✅ 页面加载');
 
-  // 3. Wait for ALL images + BGM to load
-  console.log('⏳ 等待图片和BGM加载...');
-  await page.waitForFunction('window.__recordReady === true', { timeout: 30000 });
-  console.log('✅ 全部资源就绪');
-  await page.waitForTimeout(800); // let layout settle
+  // Wait for all resources
+  console.log('⏳ 等待资源就绪...');
+  await page.waitForFunction('window.__recordReady===true', { timeout: 30000 });
+  await page.waitForTimeout(600);
+  console.log('✅ 全部就绪');
 
-  // 4. Start ffmpeg capture
-  console.log('📹 录屏开始');
-  const ffmpegProc = spawn(FFMPEG, [
-    '-f', 'gdigrab', '-framerate', '20',
-    '-offset_x', '0', '-offset_y', '0',
-    '-video_size', '1920x1080',
-    '-i', 'desktop',
-    '-c:v', 'libx264', '-preset', 'ultrafast', '-b:v', '12M',
-    '-pix_fmt', 'yuv420p',
-    '-t', '54', '-y', RAW,
-  ], { stdio: 'inherit' });
-
-  await new Promise(r => setTimeout(r, 1200));
-
-  // 5. Click to start animation
+  // Click
   console.log('▶️  启动');
   await page.click('body');
 
-  // 6. Wait for ffmpeg
-  await new Promise(r => ffmpegProc.on('close', r));
-  console.log('⏹️  录屏完成');
+  // Record 52 seconds
+  for (let s = 1; s <= 52; s++) {
+    await page.waitForTimeout(1000);
+    if (s % 10 === 0) console.log(`  ${s}s`);
+  }
 
+  clearInterval(ka);
+  console.log('⏹️  完成');
+  await ctx.close();
   await browser.close();
-  try { chromeProc.kill(); } catch(e) {}
 
-  // 7. Merge BGM + normalize fps
-  console.log('🔊 合成...');
+  // Find webm
+  const files = readdirSync('d:/Desktop/AI相册').filter(f => f.endsWith('.webm'));
+  if (!files.length) { console.log('❌ 无视频'); process.exit(1); }
+  const raw = 'd:/Desktop/AI相册/' + files.sort().pop();
+
+  console.log('🔊 升频1080p + BGM...');
   execSync(
-    `"${FFMPEG}" -i "${RAW}" -i "d:/Desktop/AI相册/想你和我们的以后.mp3" ` +
-    `-c:v libx264 -preset fast -crf 18 -c:a aac -b:a 192k ` +
-    `-map 0:v:0 -map 1:a:0 -filter:a "volume=0.55" ` +
-    `-map_metadata -1 -map_chapters -1 -t 49 ` +
-    `-movflags +faststart -y "${OUT}"`,
+    `"${FFMPEG}" -i "${raw}" -i "d:/Desktop/AI相册/想你和我们的以后.mp3" ` +
+    `-c:v libx264 -preset fast -crf 17 ` +
+    `-vf "scale=1920:1080:flags=lanczos,fps=24" ` +
+    `-c:a aac -b:a 192k -map 0:v:0 -map 1:a:0 ` +
+    `-filter:a "volume=0.55" -map_metadata -1 -map_chapters -1 ` +
+    `-t 48 -movflags +faststart -y "${OUT}"`,
     { stdio: 'inherit' }
   );
 
-  rmSync(RAW);
+  rmSync(raw);
   console.log('✅', OUT, (statSync(OUT).size / 1024 / 1024).toFixed(1) + 'MB');
   process.exit(0);
 })().catch(e => { console.error(e); process.exit(1); });
