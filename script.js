@@ -9,8 +9,9 @@ const galleryStage=document.querySelector('.gallery-stage');
 const brandTitle=document.querySelector('.brand-title');
 const vinylRecord=document.getElementById('vinyl-record'),vinylBtn=document.getElementById('vinylBtn'),vinylDisc=document.getElementById('vinylDisc'),bgm=document.getElementById('bgm');
 
-// Canvas — 0.6x internal resolution for performance
-const CANVAS_SCALE=0.6;
+// Device detection
+const isMobile=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+const CANVAS_SCALE=isMobile?0.35:0.6;
 let W,H;function rs(){W=Math.round(window.innerWidth*CANVAS_SCALE);H=Math.round(window.innerHeight*CANVAS_SCALE);canvas.width=W;canvas.height=H;canvas.style.width=window.innerWidth+'px';canvas.style.height=window.innerHeight+'px'}
 window.addEventListener('resize',rs);rs();
 
@@ -38,12 +39,15 @@ function resumeAnim(){animRunning=true}
 })();
 
 // Firefly — 100
-const FFC=100;let zoomActive=false;
+const FFC=isMobile?40:100;let zoomActive=false;
 
 // Phase 3 BG
 const bgDiv=document.createElement('div');bgDiv.id='phase3-bg';document.body.appendChild(bgDiv);
 const bgImgs=['图片背景/04e301bd5ecc25ae296bdeeba84f108d.jpg','图片背景/2be355f065f1b115e85e1fa56bbfd293.jpg','图片背景/5057f47032bba2a44e456423c5e455fe.jpg','图片背景/94f3781ab0c1e3c5c3e4e3ab51f58b9d.jpg','图片背景/b95d1d71011e6c28542c354e2b08cabf.jpg','图片背景/ea340aaaf4283708b45035358fe7d153.jpg'];
 function rndBg(){bgDiv.style.backgroundImage=`url(${bgImgs[Math.floor(Math.random()*bgImgs.length)]})`}
+
+// Preload background images so they're cached before phase 3
+const bgPreloads=bgImgs.map(src=>{const img=new Image();img.src=src;return img});
 
 class FF{constructor(){this.rst(true)}
 rst(i,z){if(z){this.x=Math.random()*W;this.y=Math.random()*H;const dx=this.x-W/2,dy=this.y-H/2,d=Math.sqrt(dx*dx+dy*dy)||1,dist=700+Math.random()*1100;this.x=W/2+dx/d*dist;this.y=H/2+dy/d*dist}else{this.x=Math.random()*W;this.y=i?Math.random()*H:H+50}this.r=Math.random()*2.6+0.8;this.vy=-(Math.random()*0.42+0.12);this.vx=(Math.random()-0.5)*0.35;this.wA=Math.random()*0.2+0.05;this.wF=Math.random()*0.015+0.005;this.bA=Math.random()*0.32+0.16;this.ph=Math.random()*Math.PI*2;this.gR=this.r*4.5;this.exVx=0;this.exVy=0;this.inEx=false;this.bf=0;this.ps=Math.random()}
