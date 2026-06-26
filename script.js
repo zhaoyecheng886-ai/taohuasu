@@ -13,9 +13,9 @@ const vinylRecord=document.getElementById('vinyl-record'),vinylBtn=document.getE
 const isRecord=new URLSearchParams(window.location.search).has('record');
 if(isRecord){
   const rs=document.createElement('style');rs.textContent=`
-    :root{--card-w:320px;--card-h:448px;--perspective:2400px}
-    .brand-title{top:1.2rem}
-    .vinyl-player{top:1rem;right:1.2rem}
+    :root{--card-w:260px;--card-h:364px;--perspective:2000px}
+    .brand-title{top:1rem;font-size:1.4rem}
+    .vinyl-player{top:0.8rem;right:1rem}
     #videoIntro{display:none!important}
   `;document.head.appendChild(rs);
 }
@@ -162,9 +162,9 @@ function posCard(cd,tx,ty,tz,sc,op,ry=0,rz=0,rx=0){cd.el.style.transform=`rotate
 // Exit FX
 function planeExit(wel){wel.style.width='';wel.style.height='';wel.style.left='';wel.style.top='';wel.style.transition='transform 0.35s cubic-bezier(.4,0,.7,1), opacity 0.25s ease';const d=Math.random()>0.5?1:-1;wel.style.transform=`rotateY(0deg) translateZ(0px) translateX(${d*250}px) translateY(-90px) rotateZ(${d*35}deg) scale(0.45)`;wel.style.opacity='0';wel.style.filter='none';wel.style.pointerEvents='none'}
 function crumpExit(wel){wel.style.width='';wel.style.height='';wel.style.left='';wel.style.top='';wel.style.transition='transform 0.25s cubic-bezier(.6,0,1,.45), opacity 0.15s ease';const rz=(Math.random()-0.5)*90;wel.style.transform=`rotateY(0deg) translateZ(0px) scale(0.06) rotateZ(${rz}deg)`;wel.style.opacity='0';wel.style.filter='none';wel.style.pointerEvents='none';shatter(wel)}
-function gridPos(n){let cw=isRecord?420:280,ch=isRecord?580:340,cols,rows;
-  if(n===3){cols=3;rows=1;cw=isRecord?360:240} // 3-card: wide row
-  else if(n===2){cols=2;rows=1;cw=isRecord?380:260} // 2-card: side by side
+function gridPos(n){let cw=isRecord?360:280,ch=isRecord?400:340,cols,rows;
+  if(n===3){cols=3;rows=1;cw=isRecord?300:240} // 3-card: wide row
+  else if(n===2){cols=2;rows=1;cw=isRecord?320:260} // 2-card: side by side
   else{cols=n<=4?2:n<=6?3:4;rows=Math.ceil(n/cols)}
   const p=[];for(let i=0;i<n;i++){const c=i%cols,r=Math.floor(i/cols);p.push({x:(c-(cols-1)/2)*cw,y:(r-(rows-1)/2)*ch})}return p}
 
@@ -218,7 +218,7 @@ function ph0(){
   const others=shuf([...Array(TOTAL).keys()].filter(i=>i!==centerIdx));
 
   // Ring config — counts must sum to TOTAL-1 (24)
-  const rz=isRecord?1.5:1; // bigger radii for 1080p large cards
+  const rz=1; // default radii, fine for both 720p and 1080p
   const ringCfg=[
     {count:5,radius:180*rz,scale:0.82,delayBase:150},
     {count:8,radius:320*rz,scale:0.68,delayBase:500},
