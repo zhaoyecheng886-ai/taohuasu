@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>桃花酥</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Video Intro -->
+    <video id="videoIntro" src="开场_回忆碎片.mp4" muted playsinline autoplay
+           style="position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:100;background:#000;"></video>
+
+    <!-- Layer 0: starlight particles -->
+    <canvas id="starfield"></canvas>
+
+    <!-- Layer 1: Deep space aurora ambient -->
+    <div class="aurora-deep"></div>
+
+    <!-- Layer 2: Vignette overlay -->
+    <div class="vignette"></div>
+
+    <!-- Main App -->
+    <main class="app-root">
+
+        <!-- Title: hidden until opening ceremony -->
+        <h1 class="brand-title" id="brandTitle">桃花酥</h1>
+
+        <!-- 3D Depth-Shuttle Gallery -->
+        <section class="viewport-3d" id="viewport3d">
+            <div class="gallery-stage" id="galleryStage">
+                <!-- Cards injected by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Vinyl Player (top-right, always visible) -->
+        <div class="vinyl-player" id="vinyl-record" title="点击任意处或此处播放音乐">
+            <button class="vinyl-btn" id="vinylBtn" aria-label="播放 / 暂停 BGM">
+                <div class="vinyl-disc" id="vinylDisc">
+                    <svg viewBox="0 0 100 100" class="vinyl-svg">
+                        <circle cx="50" cy="50" r="48" fill="#08080c" stroke="none"/>
+                        <circle cx="50" cy="50" r="43" fill="none" stroke="#1a1a26" stroke-width="0.3"/>
+                        <circle cx="50" cy="50" r="37" fill="none" stroke="#14141c" stroke-width="0.25"/>
+                        <circle cx="50" cy="50" r="31" fill="none" stroke="#1a1a26" stroke-width="0.3"/>
+                        <circle cx="50" cy="50" r="25" fill="none" stroke="#14141c" stroke-width="0.25"/>
+                        <circle cx="50" cy="50" r="19" fill="none" stroke="#1a1a26" stroke-width="0.3"/>
+                        <circle cx="50" cy="50" r="14" fill="#0a0a10"/>
+                        <circle cx="50" cy="50" r="2"  fill="#1a1a26"/>
+                    </svg>
+                </div>
+            </button>
+            <span class="vinyl-hint">BGM</span>
+        </div>
+
+    </main>
+
+    <!-- Audio -->
+    <audio id="bgm" src="想你和我们的以后.mp3" loop preload="auto"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>
