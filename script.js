@@ -17,7 +17,6 @@ if(isRecord){
     .brand-title{top:1.2rem}
     .vinyl-player{top:1rem;right:1.2rem}
     #videoIntro{display:none!important}
-    canvas{display:none!important}
   `;document.head.appendChild(rs);
   // Wait for all resources before recording starts
   window.__recordReady=false;
@@ -59,7 +58,7 @@ function resumeAnim(){animRunning=true}
 })();
 
 // Firefly — 100
-const FFC=isRecord?60:(isMobile?40:100);let zoomActive=false;
+const FFC=isRecord?20:(isMobile?40:100);let zoomActive=false;
 
 // Phase 3 BG
 const bgDiv=document.createElement('div');bgDiv.id='phase3-bg';document.body.appendChild(bgDiv);
