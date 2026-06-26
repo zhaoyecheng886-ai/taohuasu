@@ -56,122 +56,57 @@ draw(ctx){const fa=this.bf>0.01?Math.min(1,this.alpha+this.bf*0.8):(this.inEx?Ma
 const fireflies=Array.from({length:FFC},()=>new FF());
 
 // Trail
-const MAX_TR=200;const trails=[];
+const MAX_TR=isMobile?50:120;const trails=[];
 class TP{constructor(x,y){this.x=x;this.y=y;this.vx=(Math.random()-0.5)*4.5;this.vy=-(Math.random()*3.5+1.2);this.g=0.09+Math.random()*0.14;this.l=0.8;this.mL=0.8;this.r=Math.random()*1.4+0.5}get alive(){return this.l>0}upd(dt){this.x+=this.vx;this.y+=this.vy;this.vy+=this.g;this.l-=dt}draw(cx){const a=this.l/this.mL;cx.beginPath();cx.arc(this.x,this.y,this.r,0,Math.PI*2);cx.fillStyle=`rgba(255,230,160,${a})`;cx.fill()}}
-function spTr(x,y,c=3){for(let i=0;i<c;i++){if(trails.length>=MAX_TR)trails.shift();trails.push(new TP(x+(Math.random()-0.5)*8,y+(Math.random()-0.5)*8))}}
+function spTr(x,y,c=isMobile?1:2){for(let i=0;i<c;i++){if(trails.length>=MAX_TR)trails.shift();trails.push(new TP(x+(Math.random()-0.5)*8,y+(Math.random()-0.5)*8))}}
 let tMX=W/2,tMY=H/2,lTT=0;
 document.addEventListener('mousemove',e=>{tMX=e.clientX;tMY=e.clientY});
 function upTr(now,dt){if(now-lTT>25&&ceremonyDone){spTr(tMX,tMY,2);lTT=now}for(let i=trails.length-1;i>=0;i--){trails[i].upd(dt);if(!trails[i].alive)trails.splice(i,1)}}
 
 // Shards (cold, for exit fx)
-const MAX_SH=250;const shards=[],SC=[[255,255,255],[215,248,255],[195,235,255],[235,248,255]];
+const MAX_SH=isMobile?80:180;const shards=[],SC=[[255,255,255],[215,248,255],[195,235,255],[235,248,255]];
 class GS{constructor(x,y,a,s){this.x=x;this.y=y;this.vx=Math.cos(a)*s;this.vy=Math.sin(a)*s;this.g=0.05+Math.random()*0.09;this.l=0.6+Math.random()*0.2;this.mL=this.l;this.sz=2+Math.random()*5;this.rot=Math.random()*Math.PI*2;this.rS=(Math.random()-0.5)*0.35;this.c=SC[Math.floor(Math.random()*SC.length)]}get alive(){return this.l>0}upd(dt){this.x+=this.vx;this.y+=this.vy;this.vy+=this.g;this.vx*=0.985;this.vy*=0.985;this.rot+=this.rS;this.l-=dt}draw(cx){const a=this.l/this.mL,[r,g,b]=this.c;cx.save();cx.translate(this.x,this.y);cx.rotate(this.rot);cx.beginPath();cx.moveTo(0,-this.sz);cx.lineTo(this.sz*0.55,0);cx.lineTo(0,this.sz);cx.lineTo(-this.sz*0.55,0);cx.closePath();cx.fillStyle=`rgba(${r},${g},${b},${a*0.85})`;cx.fill();cx.restore()}}
-function shatter(wel){const r=wel.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,md=Math.max(r.width,r.height)*0.45;for(let i=0;i<42;i++){const ea=Math.random()*Math.PI*2,ed=Math.random()*md,sx=cx+Math.cos(ea)*ed*(r.width/md),sy=cy+Math.sin(ea)*ed*(r.height/md);shards.push(new GS(sx,sy,Math.atan2(sy-cy,sx-cx)+(Math.random()-0.5)*0.55,4+Math.random()*16));if(shards.length>MAX_SH)shards.shift()}for(let i=0;i<14;i++){const sx=cx+(Math.random()-0.5)*r.width*0.8,sy=cy+(Math.random()-0.5)*r.height*0.8;shards.push(new GS(sx,sy,Math.atan2(sy-cy,sx-cx)+(Math.random()-0.5)*0.6,3+Math.random()*10));if(shards.length>MAX_SH)shards.shift()}}
+function shatter(wel){const r=wel.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,md=Math.max(r.width,r.height)*0.45;for(let i=0;i<20;i++){const ea=Math.random()*Math.PI*2,ed=Math.random()*md,sx=cx+Math.cos(ea)*ed*(r.width/md),sy=cy+Math.sin(ea)*ed*(r.height/md);shards.push(new GS(sx,sy,Math.atan2(sy-cy,sx-cx)+(Math.random()-0.5)*0.55,4+Math.random()*16));if(shards.length>MAX_SH)shards.shift()}for(let i=0;i<8;i++){const sx=cx+(Math.random()-0.5)*r.width*0.8,sy=cy+(Math.random()-0.5)*r.height*0.8;shards.push(new GS(sx,sy,Math.atan2(sy-cy,sx-cx)+(Math.random()-0.5)*0.6,3+Math.random()*10));if(shards.length>MAX_SH)shards.shift()}}
 
-// Glint — iridescent geometric dissolution (ending fx)
-const MAX_EM=500;const embers=[];
+// Glint — lightweight geometric dissolution (ending fx)
+const MAX_EM=isMobile?120:250;const embers=[];
 const GLINT_COLORS=[
-  [0,224,240],   // cyan
-  [0,240,192],   // teal
-  [240,160,184], // pink
-  [240,200,128], // gold
-  [180,220,255], // ice blue
-  [200,180,240], // lavender
+  [0,224,240],[0,240,192],[240,160,184],[240,200,128],[180,220,255],[200,180,240],
 ];
 class Glint{
-  constructor(x,y,vx,vy,shape,sz){
+  constructor(x,y,vx,vy,sz){
     this.x=x;this.y=y;
     this.vx=vx;this.vy=vy;
-    this.g=0.04+Math.random()*0.08;
-    this.l=0.5+Math.random()*1.2;     // 0.5–1.7s, snappy
+    this.g=0.06;
+    this.l=0.35+Math.random()*0.7;   // 0.35–1.05s, quick
     this.mL=this.l;
-    this.sz=sz||(2+Math.random()*6);
-    this.shape=shape||Math.floor(Math.random()*4); // 0:diamond 1:sliver 2:triangle 3:square
-    this.rot=Math.random()*Math.PI*2;
-    this.rS=(Math.random()-0.5)*0.25;
+    this.sz=sz||(1.5+Math.random()*4);
     this.c=GLINT_COLORS[Math.floor(Math.random()*GLINT_COLORS.length)];
-    this.glowR=this.sz*1.8;
   }
   get alive(){return this.l>0}
-  upd(dt){
-    this.x+=this.vx;
-    this.y+=this.vy;
-    this.vy+=this.g;
-    this.vx*=0.98;
-    this.vy*=0.98;
-    this.rot+=this.rS;
-    this.l-=dt;
-  }
+  upd(dt){this.x+=this.vx;this.y+=this.vy;this.vy+=this.g;this.l-=dt}
   draw(cx){
-    const a=Math.min(1,this.l/this.mL);
+    const a=this.l/this.mL;
     const [r_,g_,b_]=this.c;
-    cx.save();
-    cx.translate(this.x,this.y);
-    cx.rotate(this.rot);
-    cx.globalAlpha=a;
-
-    // Subtle outer glow
-    const gl=cx.createRadialGradient(0,0,0,0,0,this.glowR);
-    gl.addColorStop(0,`rgba(${r_},${g_},${b_},0.35)`);
-    gl.addColorStop(1,`rgba(${r_},${g_},${b_},0)`);
-    cx.beginPath();cx.arc(0,0,this.glowR,0,Math.PI*2);
-    cx.fillStyle=gl;cx.fill();
-
-    // Sharp geometric shape
-    cx.beginPath();
-    const s=this.sz;
-    switch(this.shape){
-      case 0: // diamond
-        cx.moveTo(0,-s);cx.lineTo(s*0.5,0);cx.lineTo(0,s);cx.lineTo(-s*0.5,0);
-        break;
-      case 1: // thin sliver
-        cx.moveTo(0,-s*1.5);cx.lineTo(s*0.2,0);cx.lineTo(0,s*1.5);cx.lineTo(-s*0.2,0);
-        break;
-      case 2: // triangle
-        cx.moveTo(0,-s);cx.lineTo(s*0.7,s*0.7);cx.lineTo(-s*0.7,s*0.7);
-        break;
-      case 3: // square (slightly rotated by ctx already)
-        cx.rect(-s*0.5,-s*0.5,s,s);
-        break;
-    }
-    cx.closePath();
-    cx.fillStyle=`rgba(${r_},${g_},${b_},0.8)`;
-    cx.fill();
-    // Thin bright stroke
-    cx.strokeStyle=`rgba(${Math.min(255,r_+40)},${Math.min(255,g_+40)},${Math.min(255,b_+40)},0.9)`;
-    cx.lineWidth=0.6;
-    cx.stroke();
-
-    // White specular highlight dot on larger pieces
-    if(this.sz>4&&Math.random()>.5){
-      cx.beginPath();cx.arc(s*0.15,-s*0.2,this.sz*0.15,0,Math.PI*2);
-      cx.fillStyle=`rgba(255,255,255,${a*0.7})`;cx.fill();
-    }
-    cx.restore();
+    cx.beginPath();cx.arc(this.x,this.y,this.sz*0.7,0,Math.PI*2);
+    cx.fillStyle=`rgba(${r_},${g_},${b_},${a*0.7})`;cx.fill();
   }
 }
 function emberize(wel){
   const r=wel.getBoundingClientRect();
   const cx=r.left+r.width/2,cy=r.top+r.height/2;
   const w=r.width,h=r.height;
-
-  // Dense burst of micro shards
-  for(let i=0;i<100;i++){
-    const sx=cx+(Math.random()-0.5)*w*0.85;
-    const sy=cy+(Math.random()-0.5)*h*0.8;
-    const angle=Math.atan2(sy-cy,sx-cx)+(Math.random()-0.5)*0.8;
-    const speed=3+Math.random()*14;
-    const sz=1.5+Math.random()*4;
-    embers.push(new Glint(sx,sy,Math.cos(angle)*speed,Math.sin(angle)*speed,null,sz));
+  for(let i=0;i<30;i++){
+    const sx=cx+(Math.random()-0.5)*w*0.8,sy=cy+(Math.random()-0.5)*h*0.75;
+    const a=Math.atan2(sy-cy,sx-cx)+(Math.random()-0.5)*0.7;
+    const spd=3+Math.random()*12;
+    embers.push(new Glint(sx,sy,Math.cos(a)*spd,Math.sin(a)*spd,1.5+Math.random()*4));
     if(embers.length>MAX_EM)embers.shift();
   }
-  // Larger accent pieces from center
-  for(let i=0;i<20;i++){
-    const sx=cx+(Math.random()-0.5)*w*0.4;
-    const sy=cy+(Math.random()-0.5)*h*0.4;
-    const angle=Math.atan2(sy-cy,sx-cx)+(Math.random()-0.5)*0.5;
-    const speed=6+Math.random()*10;
-    embers.push(new Glint(sx,sy,Math.cos(angle)*speed,Math.sin(angle)*speed,null,5+Math.random()*8));
+  for(let i=0;i<8;i++){
+    const sx=cx+(Math.random()-0.5)*w*0.3,sy=cy+(Math.random()-0.5)*h*0.3;
+    const a=Math.atan2(sy-cy,sx-cx)+(Math.random()-0.5)*0.4;
+    embers.push(new Glint(sx,sy,Math.cos(a)*6,Math.sin(a)*6,4+Math.random()*7));
     if(embers.length>MAX_EM)embers.shift();
   }
 }
@@ -250,6 +185,7 @@ function ph1_chime(){phase='chime';activeSet.clear();hideAll();
     }
     // Sequential shatter: left to right, one by one into starfield
     setTimeout(()=>{
+      stopBeat();
       for(let i=0;i<TOTAL;i++){
         setTimeout(()=>{
           const cd=cards[i];emberize(cd.el);cd.el.classList.remove('chime');
@@ -262,6 +198,7 @@ function ph1_chime(){phase='chime';activeSet.clear();hideAll();
 // Phase 0: Ripple Opening — core photo + concentric rings bloom outward
 function ph0(){
   phase='ripple';phStart=performance.now();cancelSl();
+  startBeat(); // beat was stopped during chime particle burst
   activeSet.clear();hideAll();bgDiv.classList.remove('show');
   galleryStage.style.transform='rotateX(0deg)';
 
