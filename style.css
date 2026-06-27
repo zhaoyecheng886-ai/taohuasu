@@ -14,9 +14,9 @@
   --text-primary:  #e8e0d8;
   --text-muted:    #706860;
   --font-serif:    'Noto Serif SC', 'STSong', 'SimSun', serif;
-  --card-w:        200px;
-  --card-h:        280px;
-  --perspective:   1700px;
+  --card-w:        280px;
+  --card-h:        392px;
+  --perspective:   2000px;
 }
 
 /* ----- Reset ----- */
@@ -229,7 +229,7 @@ body {
   border-radius: 14px; overflow: hidden;
   background: rgba(6,10,20,0.98);
   border: 1px solid rgba(255,255,255,0.10);
-  box-shadow: 0 4px 24px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.04);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(255,255,255,0.06);
   transition: border-color 0.45s ease, box-shadow 0.45s ease;
 }
 
@@ -239,7 +239,7 @@ body {
 .card-scanline {
   position: absolute; inset: 0; z-index: 6;
   pointer-events: none; border-radius: 14px; overflow: hidden;
-  opacity: 0.16;
+  opacity: 0.06;
 }
 .card-scanline::after {
   content: '';
@@ -383,13 +383,13 @@ body {
 .card-gradient {
   position: absolute; bottom: 0; left: 0; right: 0; height: 35%;
   z-index: 3; pointer-events: none;
-  background: linear-gradient(to top, rgba(4,8,20,.8) 0%, transparent 100%);
+  background: linear-gradient(to top, rgba(4,8,20,.25) 0%, transparent 100%);
 }
 .card-shine {
   position: absolute; top: 0; left: 0; right: 0; height: 45%;
   z-index: 4; pointer-events: none; border-radius: 14px 14px 0 0;
   background: linear-gradient(160deg,
-    rgba(255,255,255,.10) 0%, rgba(255,255,255,.03) 35%,
+    rgba(255,255,255,.06) 0%, rgba(255,255,255,.02) 35%,
     transparent 55%, rgba(255,255,255,.01) 70%, transparent 100%);
 }
 
@@ -443,7 +443,7 @@ body {
    RESPONSIVE
    ============================================================ */
 @media (max-width: 1024px) {
-  :root { --card-w: 160px; --card-h: 225px; --perspective: 1500px; }
+  :root { --card-w: 220px; --card-h: 308px; --perspective: 1800px; }
   .brand-title { top: 2.2rem; padding: .4rem 2rem; }
   .vinyl-player { top: 2rem; right: 2rem; }
   .vinyl-btn  { width: 44px; height: 44px; }
@@ -451,7 +451,7 @@ body {
 }
 
 @media (max-width: 768px) {
-  :root { --card-w: 130px; --card-h: 180px; --perspective: 1100px; }
+  :root { --card-w: 160px; --card-h: 225px; --perspective: 1300px; }
   .brand-title { top: 1.6rem; padding: .35rem 1.5rem; font-size: 1.3rem; letter-spacing: .4em; text-indent: .4em; }
   .vinyl-player { top: 1.4rem; right: 1.2rem; }
   .vinyl-btn  { width: 38px; height: 38px; }
@@ -460,7 +460,7 @@ body {
 }
 
 @media (max-width: 480px) {
-  :root { --card-w: 100px; --card-h: 140px; --perspective: 650px; }
+  :root { --card-w: 140px; --card-h: 196px; --perspective: 900px; }
   .brand-title { top: 1.2rem; padding: .3rem 1rem; font-size: 1.1rem; letter-spacing: .3em; text-indent: .3em; }
   .vinyl-player { top: 1rem; right: .8rem; }
   .vinyl-btn  { width: 32px; height: 32px; }

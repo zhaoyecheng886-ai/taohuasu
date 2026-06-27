@@ -173,9 +173,9 @@ function posCard(cd,tx,ty,tz,sc,op,ry=0,rz=0,rx=0){cd.el.style.transform=`rotate
 // Exit FX
 function planeExit(wel){wel.style.width='';wel.style.height='';wel.style.left='';wel.style.top='';wel.style.transition='transform 0.35s cubic-bezier(.4,0,.7,1), opacity 0.25s ease';const d=Math.random()>0.5?1:-1;wel.style.transform=`rotateY(0deg) translateZ(0px) translateX(${d*250}px) translateY(-90px) rotateZ(${d*35}deg) scale(0.45)`;wel.style.opacity='0';wel.style.filter='none';wel.style.pointerEvents='none'}
 function crumpExit(wel){wel.style.width='';wel.style.height='';wel.style.left='';wel.style.top='';wel.style.transition='transform 0.25s cubic-bezier(.6,0,1,.45), opacity 0.15s ease';const rz=(Math.random()-0.5)*90;wel.style.transform=`rotateY(0deg) translateZ(0px) scale(0.06) rotateZ(${rz}deg)`;wel.style.opacity='0';wel.style.filter='none';wel.style.pointerEvents='none';shatter(wel)}
-function gridPos(n){let cw=isRecord?280:280,ch=isRecord?380:340,cols,rows;
-  if(n===3){cols=3;rows=1;cw=isRecord?230:240}
-  else if(n===2){cols=2;rows=1;cw=isRecord?260:260}
+function gridPos(n){let cw=isRecord?280:370,ch=isRecord?380:480,cols,rows;
+  if(n===3){cols=3;rows=1;cw=isRecord?230:340}
+  else if(n===2){cols=2;rows=1;cw=isRecord?260:360}
   else{cols=n<=4?2:n<=6?3:4;rows=Math.ceil(n/cols)}
   const p=[];for(let i=0;i<n;i++){const c=i%cols,r=Math.floor(i/cols);p.push({x:(c-(cols-1)/2)*cw,y:(r-(rows-1)/2)*ch})}return p}
 
