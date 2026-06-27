@@ -155,7 +155,6 @@ function createCard(media,index){
   const mw=document.createElement('div');mw.className='card-media-wrap';
   let me;if(media.isVideo){me=document.createElement('video');me.src=media.src;me.loop=true;me.muted=true;me.playsInline=true;me.className='card-media'}else{me=document.createElement('img');me.src=media.src;me.loading='lazy';me.draggable=false;me.className='card-media'}
   mw.appendChild(me);const gR=document.createElement('div');gR.className='glitch-r';const gG=document.createElement('div');gG.className='glitch-g';const gB=document.createElement('div');gB.className='glitch-b';
-  if(!media.isVideo){[gR,gG,gB].forEach(l=>{l.style.backgroundImage=`url(${media.src})`;l.style.backgroundSize='cover';l.style.backgroundPosition='center'})}
   const grad=document.createElement('div');grad.className='card-gradient';const sh=document.createElement('div');sh.className='card-shine';const scan=document.createElement('div');scan.className='card-scanline';const leak=document.createElement('div');leak.className='card-light-leak';
   inn.append(mw,gR,gG,gB,scan,leak,grad,sh);c.appendChild(inn);w.appendChild(c);
   return{el:w,card:c,inner:inn,mw,me,leak};
