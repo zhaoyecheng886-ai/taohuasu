@@ -453,7 +453,7 @@ let bT=null;function startBeat(){stopBeat();bT=setInterval(()=>{if(isMusicOn&&ce
 
 // Hover
 let hC=null,tC=null,gT=null;
-function aG(cd){if(!cd)return;const{card,mw}=cd;clearTimeout(gT);card.classList.remove('glitching');mw.style.clipPath='';mw.style.transform='';mw.style.filter='';void card.offsetWidth;card.classList.add('glitching');gT=setTimeout(()=>{card.classList.remove('glitching');mw.style.clipPath='';mw.style.transform='';mw.style.filter=''},170)}
+function aG(cd){if(!cd)return;const{card,mw}=cd;clearTimeout(gT);card.classList.remove('glitching');mw.style.filter='';void card.offsetWidth;card.classList.add('glitching');gT=setTimeout(()=>{card.classList.remove('glitching');mw.style.filter=''},100)}
 function eF(cd){if(!cd)return;cd.el.classList.add('hovered');cancelSl();aG(cd)}
 function xF(cd){if(!cd)return;cd.el.classList.remove('hovered','touched');cd.card.classList.remove('glitching');tick()}
 galleryStage.addEventListener('mouseenter',e=>{const w=e.target.closest('.card-wrapper');if(!w||!w.classList.contains('is-active'))return;const idx=parseInt(w.getAttribute('data-index'));if(isNaN(idx))return;if(hC===cards[idx])return;if(hC)xF(hC);hC=cards[idx];eF(hC)},true);
